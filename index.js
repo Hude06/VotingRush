@@ -71,23 +71,21 @@ class NPC {
         ctx.font = "20px Arial";
         ctx.fillText(this.vote,this.bounds.x,this.bounds.y);
         if (this.vote == 1) {
-            ctx.fillStyle = "red";
             this.image.src = "./ScrollRed.png";
-
         }
         else if (this.vote == 2) {
-            ctx.fillStyle = "blue";
+            this.image.src = "./ScrollBlue.png";
         }
         else if (this.vote == 3) {
-            ctx.fillStyle = "green";
+            this.image.src = "./ScrollGreen.png";
         }
         else if (this.vote == 4) {
-            ctx.fillStyle = "yellow";
             this.image.src = "./ScrollYellow.png";
         }
         else if (this.vote == 5) {
-            ctx.fillStyle = "purple";
+            this.image.src = "./ScrollPurple.png";
         }
+        
         if (this.image.src) {
             ctx.drawImage(this.image, this.bounds.x, this.bounds.y, this.bounds.w, this.bounds.h);
         } else {
@@ -108,34 +106,26 @@ class Player {
     } 
 
     draw() {
-        ctx.fillStyle = "red";
+        ctx.fillStyle = "gold";
         ctx.fillRect(this.bounds.x, this.bounds.y, this.bounds.w, this.bounds.h);
         if (this.holding != null) {
             if (this.holding.vote == 1) {
-                ctx.fillStyle = "red";
                 this.scroll.src = "./ScrollRed.png";
             }
             else if (this.holding.vote == 2) {
-                ctx.fillStyle = "blue";
-
+                this.scroll.src = "./ScrollBlue.png";
             }
             else if (this.holding.vote == 3) {
-                ctx.fillStyle = "green";
+                this.scroll.src = "./ScrollGreen.png";
             }
             else if (this.holding.vote == 4) {
-                ctx.fillStyle = "yellow";
                 this.scroll.src = "./ScrollYellow.png";
             }
             else if (this.holding.vote == 5) {
-                ctx.fillStyle = "purple";
+                this.scroll.src = "./ScrollPurple.png";
             }
             if (this.holding.vote > 0) {
-                if (this.scroll.src) {
                     ctx.drawImage(this.scroll, this.bounds.x + (this.OfsetX*15), this.bounds.y + (this.OfsetY*15), this.bounds.w, this.bounds.h);
-                } else {
-                    ctx.fillRect(this.bounds.x + (this.OfsetX*15), this.bounds.y + (this.OfsetY*15), this.bounds.w, this.bounds.h);
-
-                }
             }
 
         }
