@@ -2,6 +2,7 @@ import  {Rect} from "./JudeUtils.js";
 let canvas = document.getElementById("canvas");
 let ctx = canvas.getContext("2d");
 let currentKey = new Map();
+ctx.imageSmoothingEnabled = false;
 function initKeyboard() {
     window.addEventListener("keydown", (e) => {
         currentKey.set(e.key, true);
@@ -13,30 +14,41 @@ function initKeyboard() {
 class DropOFFStation {
     constructor(d) {
         this.station = d
-        this.bounds = new Rect(900, 1000, 100, 25);
+        this.bounds = new Rect(900, 900, 100, 100);
+        this.image = new Image();
     }
     draw() {
+        ctx.imageSmoothingEnabled = false;
         if (this.station == 1) {
             this.bounds.x = 100
+            this.image.src = "./RedVote.png";
             ctx.fillStyle = "red";
         }
         else if (this.station == 2) {
             this.bounds.x = 500
             ctx.fillStyle = "blue";
+            this.image.src = "./BlueVote.png";
         }
         else if (this.station == 3) {
             this.bounds.x = 900
+            this.image.src = "./GreenVote.png";
             ctx.fillStyle = "green";
         }
         else if (this.station == 4) {
             this.bounds.x = 1300
+            this.image.src = "./YellowVote.png";
             ctx.fillStyle = "yellow";
         }
         else if (this.station == 5) {
             this.bounds.x = 1700
             ctx.fillStyle = "purple";
+            this.image.src = "./PurpleVote.png";
         }
-        ctx.fillRect(this.bounds.x, this.bounds.y, this.bounds.w, this.bounds.h);
+        if (this.image.src) {
+            ctx.drawImage(this.image, this.bounds.x, this.bounds.y, this.bounds.w, this.bounds.h);
+        } else {
+            ctx.fillRect(this.bounds.x, this.bounds.y, this.bounds.w, this.bounds.h);
+        }
     }
     update() {
             if (player.bounds.intersects(this.bounds) || this.bounds.intersects(player.bounds)) {
@@ -50,8 +62,9 @@ class DropOFFStation {
 class NPC {
     constructor(l) {
         this.line = l
-        this.bounds = new Rect(canvas.width/2, 300-(l*50), 25, 25);
+        this.bounds = new Rect(canvas.width/2, 400-(l*100), 45, 45);
         this.vote = Math.floor(Math.random() * 5 + 1);
+        this.image = new Image();
     }
     draw() {
         ctx.fillStyle = "white";
@@ -59,6 +72,8 @@ class NPC {
         ctx.fillText(this.vote,this.bounds.x,this.bounds.y);
         if (this.vote == 1) {
             ctx.fillStyle = "red";
+            this.image.src = "./ScrollRed.png";
+
         }
         else if (this.vote == 2) {
             ctx.fillStyle = "blue";
@@ -68,11 +83,16 @@ class NPC {
         }
         else if (this.vote == 4) {
             ctx.fillStyle = "yellow";
+            this.image.src = "./ScrollYellow.png";
         }
         else if (this.vote == 5) {
             ctx.fillStyle = "purple";
         }
-        ctx.fillRect(this.bounds.x, this.bounds.y, this.bounds.w, this.bounds.h);
+        if (this.image.src) {
+            ctx.drawImage(this.image, this.bounds.x, this.bounds.y, this.bounds.w, this.bounds.h);
+        } else {
+            ctx.fillRect(this.bounds.x, this.bounds.y, this.bounds.w, this.bounds.h);
+        }
     }
 }
 class Player {
@@ -83,6 +103,7 @@ class Player {
         this.holding = 0
         this.OfsetX = 0
         this.OfsetY = -4
+        this.scroll = new Image();
 
     } 
 
@@ -92,23 +113,30 @@ class Player {
         if (this.holding != null) {
             if (this.holding.vote == 1) {
                 ctx.fillStyle = "red";
+                this.scroll.src = "./ScrollRed.png";
             }
             else if (this.holding.vote == 2) {
                 ctx.fillStyle = "blue";
+
             }
             else if (this.holding.vote == 3) {
                 ctx.fillStyle = "green";
             }
             else if (this.holding.vote == 4) {
                 ctx.fillStyle = "yellow";
+                this.scroll.src = "./ScrollYellow.png";
             }
             else if (this.holding.vote == 5) {
                 ctx.fillStyle = "purple";
             }
             if (this.holding.vote > 0) {
-                ctx.fillRect(this.bounds.x + (this.OfsetX*15), this.bounds.y + (this.OfsetY*15), this.bounds.w, this.bounds.h);
-            }
+                if (this.scroll.src) {
+                    ctx.drawImage(this.scroll, this.bounds.x + (this.OfsetX*15), this.bounds.y + (this.OfsetY*15), this.bounds.w, this.bounds.h);
+                } else {
+                    ctx.fillRect(this.bounds.x + (this.OfsetX*15), this.bounds.y + (this.OfsetY*15), this.bounds.w, this.bounds.h);
 
+                }
+            }
 
         }
     }
