@@ -8,7 +8,7 @@ let totalVotes = 0;
 ctx.imageSmoothingEnabled = false;
 let particalEngine = new ParticleEngine(ctx, {color: "white", size: 5, count: 30, duration: 50});
 
-let timeRemaining = 10;
+let timeRemaining = 60;
 function initKeyboard() {
     window.addEventListener("keydown", (e) => {
         currentKey.set(e.key, true);
@@ -33,7 +33,7 @@ let level = [
     [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
     [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
     [1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1],
-    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+    [1,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
     [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
     [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
     [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
@@ -47,24 +47,24 @@ class Level {
         this.level = level
         this.tileSet = new Image();
         this.tileSet.src = "./TileSet.png";
+        this.tree = new Image();
+        this.tree.src = "./Tree.png";
     }
     draw() {
         for (let i = 0; i < this.level.length; i++) {
             for (let j = 0; j < this.level[i].length; j++) {
                 if (this.level[i][j] == 1) {
-                    ctx.save();
                     ctx.fillStyle = 'rgba(0,225,255,0.5)';
                     ctx.fillRect(j*50, i*50, 50, 50);
                     ctx.drawImage(this.tileSet, 8*4, 8*1, 8, 8, j*50, i*50, 50, 50);
-                    ctx.restore();
                 }
                 if (this.level[i][j] == 2) {
-                    ctx.save();
                     ctx.fillStyle = 'rgba(0,225,255,0.5)';
                     ctx.fillRect(j*50, i*50, 50, 50);
-                    // walls.push(new Rect(j*50, i*50, 50, 50));
                     ctx.drawImage(this.tileSet, 8*4, 8*1, 8, 8, j*50, i*50, 50, 50);
-                    ctx.restore();
+                }
+                if (this.level[i][j] == 3) {
+                    ctx.drawImage(this.tree, j*50, i*50, 75, 75);
                 }
             }
         }   
@@ -87,6 +87,8 @@ class DropOFFStation {
         this.images[3].src = "./GreenVote.png";
         this.images[4].src = "./YellowVote.png";
         this.images[5].src = "./PurpleVote.png";
+        this.full = 0;
+        this.fullText = new Text("Full", this.bounds.x, this.bounds.y, 50, 500, false);
     }
     draw() {
         ctx.imageSmoothingEnabled = false;
@@ -105,6 +107,11 @@ class DropOFFStation {
         else if (this.station == 5) {
             this.bounds.x = 1700
         }
+        this.fullText.x = this.bounds.x-15
+        this.fullText.y = this.bounds.y-50
+        this.fullText.text = " " + this.full
+        this.fullText.startTyping()
+        this.fullText.draw(ctx)
         ctx.drawImage(this.images[this.station], this.bounds.x, this.bounds.y, this.bounds.w, this.bounds.h);
     }
     update() {
@@ -119,6 +126,7 @@ class DropOFFStation {
                         for (let i = 0; i < npcs.length; i++) {
                             npcs.shift();
                             totalVotes += 1;
+                            this.full += 1
                             return;
                         }
                         console.log("Dropped off")
@@ -176,18 +184,25 @@ class Vote {
 let switched = 0;
 class Player {
     constructor(x,y) {
-        this.bounds = new Rect(x, y, 50, 50);
+        this.bounds = new Rect(x, y, 13*5, 22*5);
         this.XVell = 0;
         this.YVell = 0;
         this.holding = null
         this.OfsetX = 0
         this.OfsetY = -4
         this.scroll = new Image();
-        
+        this.sprite = new Image()
+        this.sprite.src = "./OfficWorker.png"
     } 
     draw() {
-        ctx.fillStyle = "gold";
-        ctx.fillRect(this.bounds.x, this.bounds.y, this.bounds.w, this.bounds.h);
+        if (this.XVell < 0) {
+            ctx.save();
+            ctx.scale(-1, 1);
+            ctx.drawImage(this.sprite, -this.bounds.x-this.bounds.w, this.bounds.y, this.bounds.w, this.bounds.h);
+            ctx.restore();
+        }else {
+            ctx.drawImage(this.sprite, this.bounds.x, this.bounds.y, this.bounds.w, this.bounds.h);
+        }
     }
     update() {
         this.bounds.x += this.XVell;
@@ -196,18 +211,6 @@ class Player {
             switched -= 0.1;
         }
         if (playerActive == this) {
-            if (currentKey.get(" ")) {
-                if (switched <= 0) {
-                    if (playerActive == player) {
-                        playerActive = player2;
-                        switched = 10
-                    } else {
-                        playerActive = player;
-                        switched = 10
-
-                    }
-                }
-            }
             if (currentKey.get("ArrowUp") || currentKey.get("w")) {
                 this.YVell = -4
                 this.OfsetX = 0
@@ -250,20 +253,10 @@ class Player {
             this.holding.bounds.y = this.bounds.y + (this.OfsetY*15);
             this.holding.draw();
         }
-        // for (let i = 0; i < walls.length; i++) {
-        //     if (this.bounds.intersects(walls[i]) || walls[i].intersects(this.bounds)) {
-        //         if (this.YVell > 0) {
-        //             this.bounds.y = walls[i].y - this.bounds.h - 5;
-        //         } else if (this.YVell < 0) {
-        //             this.bounds.y = walls[i].y + walls[i].h + 5;
-        //         }   
-        //     }
-        // }
     }
 }
 
 let npcs = [];
-let player = new Player(100,800);
 let player2 = new Player(500,300);
 let playerActive = player2;
 
@@ -277,7 +270,7 @@ let currentScreen = 1;
 for (let i = 0; i < 10; i++) {
     npcs.push(new NPC(i));
 }
-let timeText = new Text(""  + Math.floor(timeRemaining), canvas.width-250, canvas.height-250, 75, 500, false);
+let timeText = new Text(""  + Math.floor(timeRemaining), canvas.width-250, 100, 75, 500, false);
 let gameOver = new Text("Game Over", canvas.width/2-350, canvas.height/2, 75, 10, false);
 let votes = new Text("Votes" + totalVotes, 100, 100, 75, 500, true);
 function loop() {
@@ -291,7 +284,6 @@ function loop() {
         timeText.draw(ctx);
         particalEngine.draw();
         level1.draw();
-        // player.draw();
         player2.draw();
         for (let i = 0; i < stations.length; i++) {
             stations[i].draw();
@@ -299,7 +291,6 @@ function loop() {
         }
         particalEngine.update(1);
         player2.update();
-        // player.update();
         for (let i = 0; i < npcs.length; i++) {
             npcs[i].draw();
         }
